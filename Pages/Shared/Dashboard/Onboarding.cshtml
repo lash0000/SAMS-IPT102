@@ -1,0 +1,114 @@
+﻿@page
+@model SAMS_IPT102.Pages.Dashboard.OnboardingModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Welcome, user!";
+}
+
+<section>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                <i class="bi bi-house-door"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-file-earmark"></i>
+                                Account Setting
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-cart"></i>
+                                Generate Reports
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="bi bi-people"></i>
+                                Log Out
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 p-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-2 border-bottom">
+                    <h1 class="h2">Welcome, supershyboy!</h1>
+                </div>
+                <p>Quickly start managing your student attendance.</p>
+
+                <!-- First row of boxes -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm rounded-3 border-light">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-primary">Today's Attendance</h5>
+                                <p class="card-text flex-grow-1">Quick overview of today's attendance statistics.</p>
+                                <a href="#" class="btn btn-outline-primary mt-auto">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm rounded-3 border-light">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-success">Class Performance</h5>
+                                <p class="card-text flex-grow-1">Check the overall performance of your classes.</p>
+                                <a href="#" class="btn btn-outline-success mt-auto">Analyze</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm rounded-3 border-light">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-info">Upcoming Events</h5>
+                                <p class="card-text flex-grow-1">Stay updated with upcoming school events.</p>
+                                <a href="#" class="btn btn-outline-info mt-auto">See Calendar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Second row of boxes -->
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm rounded-3 border-light">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-primary">Absent Students</h5>
+                                <p class="card-text flex-grow-1">List of students who are absent today.</p>
+                                <a href="#" class="btn btn-outline-primary mt-auto">View List</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm rounded-3 border-light">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-danger">Attendance Alerts</h5>
+                                <p class="card-text flex-grow-1">Important notifications about attendance issues.</p>
+                                <a href="#" class="btn btn-outline-danger mt-auto">Check Alerts</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 shadow-sm rounded-3 border-light">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-secondary">Reports</h5>
+                                <p class="card-text flex-grow-1">Generate and view attendance reports.</p>
+                                <a href="#" class="btn btn-outline-secondary mt-auto">Generate Report</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</section>

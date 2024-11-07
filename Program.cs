@@ -3,6 +3,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+//Register my DBService as a singleton or scoped
+builder.Services.AddSingleton<SAMS_IPT102.Services.DBService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

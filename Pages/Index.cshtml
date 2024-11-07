@@ -5,6 +5,64 @@
 }
 
 <section id="login-container" class="d-none d-md-flex align-items-center justify-content-center vh-100">
+    <div class="dashboard-wrapper">
+        <div class="text-center">
+            <h1>Student Attendance Record</h1>
+            <p>For Professors Side Portal (This will keep adding during real time data submission thru RFID</p>
+        </div>
+        <div class="student-data">
+            <table class="table table-bordered" id="attendanceTable">
+                <tr>
+                    <th>Student Number</th>
+                    <th>Student (LN, FN, MI)</th>
+                    <th>RFID Number</th>
+                    <th>Year &amp; Course</th>
+                    <th>Date &amp; Time (Attendance)</th>
+                </tr>
+                
+                <tr>
+                    <td>2023-0001</td>
+                    <td>Smith, John A.</td>
+                    <td>RF001234</td>
+                    <td>3rd Year, BS Computer Science</td>
+                    <td>2023-05-15 08:30:00</td>
+                </tr>
+                <!--
+                <tr>
+                    <td>2023-0002</td>
+                    <td>Johnson, Emily B.</td>
+                    <td>RF005678</td>
+                    <td>2nd Year, BS Biology</td>
+                    <td>2023-05-15 08:35:15</td>
+                </tr>
+                <tr>
+                    <td>2023-0003</td>
+                    <td>Williams, Michael C.</td>
+                    <td>RF009012</td>
+                    <td>4th Year, BS Engineering</td>
+                    <td>2023-05-15 08:40:30</td>
+                </tr>
+                <tr>
+                    <td>2023-0004</td>
+                    <td>Brown, Sarah D.</td>
+                    <td>RF003456</td>
+                    <td>1st Year, BS Psychology</td>
+                    <td>2023-05-15 08:45:45</td>
+                </tr>
+                <tr>
+                    <td>2023-0005</td>
+                    <td>Jones, David E.</td>
+                    <td>RF007890</td>
+                    <td>3rd Year, BS Accounting</td>
+                    <td>2023-05-15 08:50:00</td>
+                </tr> -->
+            </table>
+            <div id="noRecordsMessage" style="display: none;">
+                <p>There are no existing records.</p>
+            </div>
+        </div>
+    </div>
+    <!--
     <div class="login-wrapper">
         <div class="login-header">
             <h1 class="text-dark">Sign In</h1>
@@ -23,11 +81,32 @@
             <a href="" class="btn btn-light w-100">Sign Up</a>
         </form>
     </div>
+    -->
 </section>
 
+<script>
+    function checkForRecords() {
+        var table = document.getElementById('attendanceTable');
+        var noRecordsMessage = document.getElementById('noRecordsMessage');
+
+        if (table.rows.length <= 1) {
+            table.style.display = 'none';
+            noRecordsMessage.style.display = 'block';
+        } else {
+            table.style.display = 'table';
+            noRecordsMessage.style.display = 'none';
+        }
+    }
+
+    // Call the function when the page loads
+    window.onload = checkForRecords;
+</script>
+
 <!-- show test user creds ^^ -->
+<!--
 <div class="principal-author">
     <a href="/Shared/Dashboard/Onboarding" class="btn btn-link">
         Redirect to Onboarding (Test)
     </a>
 </div>
+-->

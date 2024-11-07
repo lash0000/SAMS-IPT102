@@ -7,4 +7,8 @@
     <RootNamespace>SAMS_IPT102</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="9.1.0" />
+  </ItemGroup>
+
 </Project>

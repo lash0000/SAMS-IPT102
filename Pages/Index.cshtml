@@ -4,102 +4,102 @@
     ViewData["Title"] = "Sign in first";
 }
 
-<section id="login-container" class="d-none d-md-flex align-items-center justify-content-center vh-100">
+<section id="login-container" class="d-flex align-items-center justify-content-center flex-column vh-100">
     <div class="dashboard-wrapper">
-        <div class="text-center">
+        <div class="text-center mb-3">
             <h1>Student Attendance Record</h1>
-            <p>For Professors Side Portal (This will keep adding during real time data submission thru RFID</p>
+            <p>Applicable for today's class (This will keep adding during real-time data submission thru RFID)</p>
+            <button class="btn btn-primary" onclick="refreshPage()">Refresh</button>
         </div>
         <div class="student-data">
-            <table class="table table-bordered" id="attendanceTable">
-                <tr>
-                    <th>Student Number</th>
-                    <th>Student (LN, FN, MI)</th>
-                    <th>RFID Number</th>
-                    <th>Year &amp; Course</th>
-                    <th>Date &amp; Time (Attendance)</th>
-                </tr>
-                
-                <tr>
-                    <td>2023-0001</td>
-                    <td>Smith, John A.</td>
-                    <td>RF001234</td>
-                    <td>3rd Year, BS Computer Science</td>
-                    <td>2023-05-15 08:30:00</td>
-                </tr>
-                <!--
-                <tr>
-                    <td>2023-0002</td>
-                    <td>Johnson, Emily B.</td>
-                    <td>RF005678</td>
-                    <td>2nd Year, BS Biology</td>
-                    <td>2023-05-15 08:35:15</td>
-                </tr>
-                <tr>
-                    <td>2023-0003</td>
-                    <td>Williams, Michael C.</td>
-                    <td>RF009012</td>
-                    <td>4th Year, BS Engineering</td>
-                    <td>2023-05-15 08:40:30</td>
-                </tr>
-                <tr>
-                    <td>2023-0004</td>
-                    <td>Brown, Sarah D.</td>
-                    <td>RF003456</td>
-                    <td>1st Year, BS Psychology</td>
-                    <td>2023-05-15 08:45:45</td>
-                </tr>
-                <tr>
-                    <td>2023-0005</td>
-                    <td>Jones, David E.</td>
-                    <td>RF007890</td>
-                    <td>3rd Year, BS Accounting</td>
-                    <td>2023-05-15 08:50:00</td>
-                </tr> -->
-            </table>
-            <div id="noRecordsMessage" style="display: none;">
-                <p>There are no existing records.</p>
+            <div style="max-height: 320px; overflow-y: auto;">
+                <table class="table table-bordered" id="attendanceTable">
+                    <thead>
+                        <tr>
+                            <th>Student Number</th>
+                            <th>Student (LN, FN, MI)</th>
+                            <th>RFID Number</th>
+                            <th>Year &amp; Course</th>
+                            <th>Date &amp; Time (Time-In)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.AttendanceRecords != null && Model.AttendanceRecords.Any())
+                        {
+                            foreach (var record in Model.AttendanceRecords)
+                            {
+                                <tr>
+                                    <td>@record.StudentNumber</td>
+                                    <td>@record.LastName, @record.FirstName @record.MiddleInitial.</td>
+                                    <td>@record.RFIDNumber</td>
+                                    <td>@record.Course</td>
+                                    <td>@record.AttendanceDateTime</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center">No records available.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    <!--
-    <div class="login-wrapper">
-        <div class="login-header">
-            <h1 class="text-dark">Sign In</h1>
-            <p class="text-muted">Enter your credentials.</p>
-        </div>
-        <form method="get">
-            <div class="mb-2">
-                <label for="email" class="form-label">Email address</label>
-                <input type="email" class="form-control" id="email" required>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
-            <a href="" class="btn btn-light w-100">Sign Up</a>
-        </form>
+
+    <div class="d-md-flex align-items-center justify-content-center mt-3">
+        <a class="btn btn-primary me-2" href="#">Generate Summary Reports</a>
+        <button class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#clearAttendanceModal">Clear Attendance Logs</button>
+        <a class="btn btn-primary" href="#">Student Records Management</a>
     </div>
-    -->
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="clearAttendanceModal" tabindex="-1" aria-labelledby="clearAttendanceModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="clearAttendanceModalLabel">Confirm Action</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to clear the attendance logs? This action cannot be undone.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>   
+            <!-- Post request for clearing logs -->
+            <form method="post" asp-page-handler="ClearAttendanceLogs">
+               <button type="submit" class="btn btn-danger">Confirm</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
 </section>
 
-<script>
-    function checkForRecords() {
-        var table = document.getElementById('attendanceTable');
-        var noRecordsMessage = document.getElementById('noRecordsMessage');
 
-        if (table.rows.length <= 1) {
-            table.style.display = 'none';
-            noRecordsMessage.style.display = 'block';
-        } else {
-            table.style.display = 'table';
-            noRecordsMessage.style.display = 'none';
-        }
+<script>
+    function refreshPage() {
+        location.reload(); // This reloads the entire page
     }
 
+    // function checkForRecords() {
+    //     var table = document.getElementById('attendanceTable');
+    //     var noRecordsMessage = document.getElementById('noRecordsMessage');
+
+    //     if (table.rows.length <= 1) {
+    //         table.style.display = 'none';
+    //         noRecordsMessage.style.display = 'block';
+    //     } else {
+    //         table.style.display = 'table';
+    //         noRecordsMessage.style.display = 'none';
+    //     }
+    // }
+
     // Call the function when the page loads
-    window.onload = checkForRecords;
+    // window.onload = checkForRecords;
 </script>
 
 <!-- show test user creds ^^ -->

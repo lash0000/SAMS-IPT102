@@ -12,7 +12,7 @@ namespace SAMS_IPT102.Services
             Connections = new List<DBConnection>
             {
                 new DBConnection("sams_web_portal"),
-                new DBConnection("sams_desktop_portal")
+                //new DBConnection("sams_desktop_portal")
             };
         }
 

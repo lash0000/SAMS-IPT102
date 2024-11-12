@@ -74,7 +74,7 @@ namespace SAMS_IPT102.Pages
             {
                 _logger.LogError($"Failed to clear attendance logs: {ex.Message}");
                 ModelState.AddModelError(string.Empty, "Failed to clear attendance logs.");
-                return Page();
+                return RedirectToPage("Error");
             }
         }
 
@@ -82,7 +82,11 @@ namespace SAMS_IPT102.Pages
         {
             if (DateTime.TryParse(attendanceTimeIn, out DateTime attendanceDateTime))
             {
-                return attendanceDateTime.ToString("dd/MM/yyyy hh:mm tt");  // Format to DD/MM/YYYY (12-Hour format)
+                // Convert the time to GMT+8 (Taipei Standard Time)
+                TimeZoneInfo taipeiTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+                DateTime taipeiDateTime = TimeZoneInfo.ConvertTime(attendanceDateTime, taipeiTimeZone);
+
+                return taipeiDateTime.ToString("dd/MM/yyyy hh:mm tt");  // Format to DD/MM/YYYY (12-Hour format)
             }
             return string.Empty;  // Return empty string if the date is invalid or null
         }

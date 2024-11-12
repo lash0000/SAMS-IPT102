@@ -1,7 +1,7 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Sign in first";
+    ViewData["Title"] = "Welcome to your attendance record management.";
 }
 
 <section id="login-container" class="d-flex align-items-center justify-content-center flex-column vh-100">
@@ -86,29 +86,4 @@
     function refreshPage() {
         location.reload(); // This reloads the entire page
     }
-
-    // function checkForRecords() {
-    //     var table = document.getElementById('attendanceTable');
-    //     var noRecordsMessage = document.getElementById('noRecordsMessage');
-
-    //     if (table.rows.length <= 1) {
-    //         table.style.display = 'none';
-    //         noRecordsMessage.style.display = 'block';
-    //     } else {
-    //         table.style.display = 'table';
-    //         noRecordsMessage.style.display = 'none';
-    //     }
-    // }
-
-    // Call the function when the page loads
-    // window.onload = checkForRecords;
 </script>
-
-<!-- show test user creds ^^ -->
-<!--
-<div class="principal-author">
-    <a href="/Shared/Dashboard/Onboarding" class="btn btn-link">
-        Redirect to Onboarding (Test)
-    </a>
-</div>
--->

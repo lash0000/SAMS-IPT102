@@ -19,7 +19,8 @@
                             <th>Student Number</th>
                             <th>Student (LN, FN, MI)</th>
                             <th>RFID Number</th>
-                            <th>Year &amp; Course</th>
+                            <th>Current Year &amp; Course</th>
+                            <th>Current Section</th>
                             <th>Date &amp; Time (Time-In)</th>
                         </tr>
                     </thead>
@@ -33,6 +34,7 @@
                                     <td>@record.LastName, @record.FirstName @record.MiddleInitial.</td>
                                     <td>@record.RFIDNumber</td>
                                     <td>@record.Course</td>
+                                    <td>@record.CurrentSection</td>
                                     <td>@record.AttendanceDateTime</td>
                                 </tr>
                             }
@@ -40,7 +42,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="5" class="text-center">No records available.</td>
+                                <td colspan="6" class="text-center">No records available.</td>
                             </tr>
                         }
                     </tbody>
@@ -57,24 +59,24 @@
 
     <!-- Confirmation Modal -->
     <div class="modal fade" id="clearAttendanceModal" tabindex="-1" aria-labelledby="clearAttendanceModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="clearAttendanceModalLabel">Confirm Action</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            Are you sure you want to clear the attendance logs? This action cannot be undone.
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>   
-            <!-- Post request for clearing logs -->
-            <form method="post" asp-page-handler="ClearAttendanceLogs">
-               <button type="submit" class="btn btn-danger">Confirm</button>
-            </form>
-          </div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="clearAttendanceModalLabel">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to clear the attendance logs? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <!-- Post request for clearing logs -->
+                    <form method="post" asp-page-handler="ClearAttendanceLogs">
+                        <button type="submit" class="btn btn-danger">Confirm</button>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
 </section>

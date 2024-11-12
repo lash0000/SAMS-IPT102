@@ -53,9 +53,12 @@ namespace SAMS_IPT102.Pages
                                          ? student.middle_name.Substring(0, 1).ToUpper()
                                          : "", // Extract middle initial from middle_name
                                      RFIDNumber = student.rfid_number ?? "",
-                                     Course = $"{student.enrollment_year} School Year, {student.course}",
+                                     Course = $"{student.current_year} S.Y, {student.course}",
+                                     CurrentSection = $"{student.current_section}",
                                      AttendanceDateTime = FormatAttendanceDateTime(attendance.attendance_time_in)
-                                 }).ToList();
+                                 })
+                                 .OrderByDescending(a => DateTime.TryParse(a.AttendanceDateTime, out DateTime parsedDate) ? parsedDate : DateTime.MinValue) // Sorting by DateTime
+                                 .ToList();
         }
 
         public async Task<IActionResult> OnPostClearAttendanceLogsAsync()
@@ -101,6 +104,9 @@ namespace SAMS_IPT102.Pages
         public string rfid_number { get; set; } = "";
         public int enrollment_year { get; set; }
         public string course { get; set; } = "";
+        // It's hot yet
+        public int current_year { get; set; }
+        public string current_section { get; set; } = "";
     }
 
     public class AttendanceRecord
@@ -111,6 +117,8 @@ namespace SAMS_IPT102.Pages
         public string MiddleInitial { get; set; } = "";
         public string RFIDNumber { get; set; } = "";
         public string Course { get; set; } = "";
+
+        public string CurrentSection { get; set; } = "";
         public string AttendanceDateTime { get; set; } = "";
     }
 }

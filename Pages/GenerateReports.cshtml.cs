@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using SAMS_IPT102.Models;
+using System;
 
 namespace SAMS_IPT102.Pages
 {
@@ -31,7 +32,6 @@ namespace SAMS_IPT102.Pages
 
         // List to hold attendance records retrieved from the API
         public List<AttendanceRecord> AttendanceRecords { get; set; } = new List<AttendanceRecord>();
-        public List<AttendanceLog> AttendanceLogs { get; set; } = new List<AttendanceLog>();
 
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -71,8 +71,23 @@ namespace SAMS_IPT102.Pages
                     body.AppendChild(new Paragraph(new Run(new Text("Time-Out: " + TimeOut))));
                     body.AppendChild(new Paragraph(new Run(new Text("Professor Name: " + ProfessorName))));
 
-                    // Attendance Records Table Section
+                    // Attendance Records Table Section with Table Grid Design
                     Table table = new Table();
+
+                    // Define table properties for grid styling
+                    TableProperties tableProperties = new TableProperties(
+                        new TableBorders(
+                            new TopBorder { Val = BorderValues.Single, Size = 4 },
+                            new BottomBorder { Val = BorderValues.Single, Size = 4 },
+                            new LeftBorder { Val = BorderValues.Single, Size = 4 },
+                            new RightBorder { Val = BorderValues.Single, Size = 4 },
+                            new InsideHorizontalBorder { Val = BorderValues.Single, Size = 4 },
+                            new InsideVerticalBorder { Val = BorderValues.Single, Size = 4 }
+                        )
+                    );
+                    table.AppendChild(tableProperties);
+
+                    // Header Row
                     TableRow headerRow = new TableRow(
                         new TableCell(new Paragraph(new Run(new Text("Student Number")))),
                         new TableCell(new Paragraph(new Run(new Text("Student (LN, FN, MI)")))),
@@ -82,9 +97,22 @@ namespace SAMS_IPT102.Pages
                         new TableCell(new Paragraph(new Run(new Text("Date & Time (Time-In)"))))
                     );
 
+                    // Style the header row
+                    foreach (TableCell cell in headerRow.Elements<TableCell>())
+                    {
+                        cell.TableCellProperties = new TableCellProperties(
+                            new Shading { Val = ShadingPatternValues.Clear, Fill = "D9D9D9" }, // Light gray background for header
+                            new TableCellBorders(
+                                new TopBorder { Val = BorderValues.Single, Size = 4 },
+                                new BottomBorder { Val = BorderValues.Single, Size = 4 },
+                                new LeftBorder { Val = BorderValues.Single, Size = 4 },
+                                new RightBorder { Val = BorderValues.Single, Size = 4 }
+                            )
+                        );
+                    }
                     table.Append(headerRow);
 
-                    // Iterate through AttendanceRecords and add each row to the table
+                    // Data Rows
                     foreach (var record in AttendanceRecords)
                     {
                         TableRow row = new TableRow(
@@ -95,6 +123,19 @@ namespace SAMS_IPT102.Pages
                             new TableCell(new Paragraph(new Run(new Text(record.CurrentSection)))),
                             new TableCell(new Paragraph(new Run(new Text(record.AttendanceDateTime)))) // Use AttendanceDateTime for time-in
                         );
+
+                        // Apply borders to each cell for grid design
+                        foreach (TableCell cell in row.Elements<TableCell>())
+                        {
+                            cell.TableCellProperties = new TableCellProperties(
+                                new TableCellBorders(
+                                    new TopBorder { Val = BorderValues.Single, Size = 4 },
+                                    new BottomBorder { Val = BorderValues.Single, Size = 4 },
+                                    new LeftBorder { Val = BorderValues.Single, Size = 4 },
+                                    new RightBorder { Val = BorderValues.Single, Size = 4 }
+                                )
+                            );
+                        }
 
                         table.Append(row);
                     }
@@ -139,9 +180,9 @@ namespace SAMS_IPT102.Pages
                                          CurrentSection = student.current_section,
                                          AttendanceDateTime = log?.attendance_time_in != null
                                      ? DateTime.TryParse(log.attendance_time_in, out var dateTime)
-                                         ? dateTime.ToString("MM/dd/yyyy hh:mm tt") // Format to 12-hour time
+                                         ? TimeZoneInfo.ConvertTime(dateTime, TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time")).ToString("MM/dd/yyyy hh:mm tt") // Apply GMT +8 (Taipei Standard Time)
                                          : "Invalid Date"
-                                     : "Not Provided"
+                                     : "Missing"
                                      }).ToList();
             }
         }

@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using System.Linq;
+using SAMS_IPT102.Services;
 
 namespace SAMS_IPT102.Pages
 {
@@ -13,11 +15,13 @@ namespace SAMS_IPT102.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly HttpClient _httpClient;
+        private readonly DynamoDbService _dynamoDbService;
 
-        public IndexModel(ILogger<IndexModel> logger, HttpClient httpClient)
+        public IndexModel(ILogger<IndexModel> logger, HttpClient httpClient, DynamoDbService dynamoDbService)
         {
             _logger = logger;
             _httpClient = httpClient;
+            _dynamoDbService = dynamoDbService;
         }
 
         public List<AttendanceRecord> AttendanceRecords { get; set; } = new List<AttendanceRecord>();
@@ -52,6 +56,23 @@ namespace SAMS_IPT102.Pages
                                      Course = $"{student.enrollment_year} School Year, {student.course}",
                                      AttendanceDateTime = FormatAttendanceDateTime(attendance.attendance_time_in)
                                  }).ToList();
+        }
+
+        public async Task<IActionResult> OnPostClearAttendanceLogsAsync()
+        {
+            try
+            {
+                // Call the DynamoDB delete service to delete all items
+                await _dynamoDbService.DeleteAllItemsAsync();
+                _logger.LogInformation("All attendance logs have been cleared successfully.");
+                return RedirectToPage("/Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to clear attendance logs: {ex.Message}");
+                ModelState.AddModelError(string.Empty, "Failed to clear attendance logs.");
+                return Page();
+            }
         }
 
         private string FormatAttendanceDateTime(string attendanceTimeIn)

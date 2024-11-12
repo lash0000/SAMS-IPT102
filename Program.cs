@@ -6,6 +6,14 @@ builder.Services.AddHttpClient(); // Register HttpClient
 
 //Register my DBService as a singleton or scoped
 builder.Services.AddSingleton<SAMS_IPT102.Services.DBService>();
+builder.Services.AddScoped<SAMS_IPT102.Services.DynamoDbService>();
+
+// Set AWS options from configuration
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions("AWS"));
+
+// Register AWS DynamoDB client
+builder.Services.AddAWSService<Amazon.DynamoDBv2.IAmazonDynamoDB>();
+
 
 var app = builder.Build();
 

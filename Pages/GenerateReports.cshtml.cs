@@ -50,6 +50,18 @@ namespace SAMS_IPT102.Pages
             // Retrieve attendance records from the API
             await FetchAttendanceRecordsFromAPI();
 
+            // Parse and format TimeIn and TimeOut with Taipei timezone
+            DateTime timeInDateTime, timeOutDateTime;
+            var taipeiTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
+
+            string formattedTimeIn = DateTime.TryParse(TimeIn, out timeInDateTime)
+                ? TimeZoneInfo.ConvertTime(timeInDateTime, taipeiTimeZone).ToString("dd/MM/yyyy hh:mm tt")
+                : "Invalid Time";
+
+            string formattedTimeOut = DateTime.TryParse(TimeOut, out timeOutDateTime)
+                ? TimeZoneInfo.ConvertTime(timeOutDateTime, taipeiTimeZone).ToString("dd/MM/yyyy hh:mm tt")
+                : "Invalid Time";
+
             // Generate the DOCX file
             using (var memoryStream = new MemoryStream())
             {
@@ -67,8 +79,8 @@ namespace SAMS_IPT102.Pages
                     body.AppendChild(new Paragraph(new Run(new Text("Year and Section: " + YearSection))));
                     body.AppendChild(new Paragraph(new Run(new Text("Subject Name: " + SubjectName))));
                     body.AppendChild(new Paragraph(new Run(new Text("Room: " + Room))));
-                    body.AppendChild(new Paragraph(new Run(new Text("Time-In: " + TimeIn))));
-                    body.AppendChild(new Paragraph(new Run(new Text("Time-Out: " + TimeOut))));
+                    body.AppendChild(new Paragraph(new Run(new Text("Time-In: " + formattedTimeIn))));
+                    body.AppendChild(new Paragraph(new Run(new Text("Time-Out: " + formattedTimeOut))));
                     body.AppendChild(new Paragraph(new Run(new Text("Professor Name: " + ProfessorName))));
 
                     // Attendance Records Table Section with Table Grid Design

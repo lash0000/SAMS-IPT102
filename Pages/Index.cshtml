@@ -4,11 +4,11 @@
     ViewData["Title"] = "Welcome to your attendance record management.";
 }
 
-<section id="login-container" class="d-flex align-items-center justify-content-center flex-column vh-100">
+<section class="d-flex align-items-center justify-content-center flex-column vh-100">
     <div class="dashboard-wrapper">
         <div class="text-center mb-3">
             <h1>Student Attendance Record</h1>
-            <p>Applicable for today's class (This will keep adding during real-time data submission thru RFID)</p>
+            <p>Applicable for today's class (Do some refresh to reload the page)</p>
             <button class="btn btn-primary" onclick="refreshPage()">Refresh</button>
         </div>
         <div class="student-data">
@@ -52,9 +52,9 @@
     </div>
 
     <div class="d-md-flex align-items-center justify-content-center mt-3">
-        <a class="btn btn-primary me-2" href="#">Generate Summary Reports</a>
+        <a class="btn btn-primary me-2" href="@Url.Page("/GenerateReports")">Generate Summary Reports</a>
         <button class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#clearAttendanceModal">Clear Attendance Logs</button>
-        <a class="btn btn-primary" href="#">Student Records Management</a>
+        <!-- <a class="btn btn-primary" href="#">Student Records Management</a> -->
     </div>
 
     <!-- Confirmation Modal -->
@@ -78,9 +78,13 @@
             </div>
         </div>
     </div>
-
 </section>
 
+<div class="principal-author">
+    <a href="/SAMS-IPT102.zip" class="btn btn-link" download>
+        Try this out.
+    </a>
+</div>
 
 <script>
     function refreshPage() {

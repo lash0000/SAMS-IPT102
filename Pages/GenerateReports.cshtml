@@ -1,0 +1,88 @@
+﻿@page
+@model SAMS_IPT102.Pages.GenerateReportsModel
+@{
+    ViewData["Title"] = "Welcome to your attendance record generating reports.";
+}
+
+<section class="d-flex align-items-center justify-content-center vh-100">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-primary">
+                    <a href="/" class="text-decoration-none text-primary">Generate Attendance Report</a>
+                </h2>
+                <!-- Start of the form for generating the report -->
+                <form id="reportForm" method="post">
+                    <div class="form-group">
+                        <label for="subjectCode">Subject Code:</label>
+                        <input type="text" id="subjectCode" name="subjectCode" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="yearSection">Year and Section:</label>
+                        <input type="text" id="yearSection" name="yearSection" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="subjectName">Subject Name:</label>
+                        <input type="text" id="subjectName" name="subjectName" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="room">Room:</label>
+                        <input type="text" id="room" name="room" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="timeIn">Time In:</label>
+                        <input type="datetime-local" id="timeIn" name="timeIn" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="timeOut">Time Out:</label>
+                        <input type="datetime-local" id="timeOut" name="timeOut" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="professorName">Professor Name:</label>
+                        <input type="text" id="professorName" name="professorName" class="form-control mb-3" required>
+                    </div>
+
+                    <!-- Button to open the Confirmation Modal -->
+                    <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#GenerateReportModal">Proceed</button>
+
+                    <!-- Confirmation Modal -->
+                    <div class="modal fade" id="GenerateReportModal" tabindex="-1" aria-labelledby="GenerateReportModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="GenerateReportModal">Confirm Action</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Do you proceed to generate your report?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-danger" onclick="submitForm()">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function submitForm() {
+        // Submit the form to trigger the download
+        document.getElementById("reportForm").submit();
+
+        // Close the modal and reload the page after a short delay
+        setTimeout(function () {
+            // Dismiss the modal
+            var modal = bootstrap.Modal.getInstance(document.getElementById('GenerateReportModal'));
+            modal.hide();
+
+            // Reload the page
+            location.reload();
+        }, 2000);
+    }
+
+</script>

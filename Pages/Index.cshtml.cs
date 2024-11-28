@@ -109,7 +109,7 @@ namespace SAMS_IPT102.Pages
         public int enrollment_year { get; set; }
         public string course { get; set; } = "";
         // It's hot yet
-        public int current_year { get; set; }
+        public string current_year { get; set; }
         public string current_section { get; set; } = "";
     }
 

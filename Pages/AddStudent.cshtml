@@ -1,0 +1,253 @@
+﻿@page
+@model SAMS_IPT102.Pages.AddStudentModel
+@{
+    ViewData["Title"] = "Add New Student Record";
+}
+
+<section class="d-flex align-items-center justify-content-center mt-4 mb-4" style="min-height: calc(100vh - 80px);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-primary">
+                    <a href="/" class="text-decoration-none text-primary">Add New Student Record</a>
+                </h2>
+                <p>Fill out the form below to add a new student record to our attendance monitoring system.</p>
+                <form id="addStudentForm" method="post">
+                    <div class="form-group">
+                        <label for="rfidNumber">RFID Number (Tap their IDs):</label>
+                        <input type="text" id="rfidNumber" name="rfid_number" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentNumber">Student Number:</label>
+                        <input type="text" id="studentNumber" name="student_number" class="form-control mb-2" placeholder="ex: YY-0000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="enrollmentYear">Enrollment Year (Auto-fill from Student Number):</label>
+                        <input type="number" id="enrollmentYear" name="enrollment_year" class="form-control mb-2" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName">First Name:</label>
+                        <input type="text" id="firstName" name="first_name" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="middleName">Middle Name:</label>
+                        <input type="text" id="middleName" name="middle_name" class="form-control mb-2">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name:</label>
+                        <input type="text" id="lastName" name="last_name" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender:</label>
+                        <select id="gender" name="Gender" class="form-control mb-2" required>
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateOfBirth">Date of Birth:</label>
+                        <input type="date" id="dateOfBirth" name="date_of_birth" class="form-control mb-2">
+                    </div>
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number:</label>
+                        <input type="number" id="phoneNumber" name="phone_number" placeholder="ex: (+63)" class="form-control mb-2">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department:</label>
+                        <select id="department" name="department" class="form-control mb-2" required>
+                            <option value="">Select Department</option>
+                            <option value="College of Education">College of Education</option>
+                            <option value="College of Engineering">College of Engineering</option>
+                            <option value="College of Computer Studies">College of Computer Studies</option>
+                            <option value="College of Business Administration and Accountancy">College of Business Administration and Accountancy</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="course">Course:</label>
+                        <select id="course" name="course" class="form-control mb-2" required disabled>
+                            <option value="">Select Course</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="currentYear">Current Year:</label>
+                        <select id="currentYear" name="current_year" class="form-control mb-2" required disabled>
+                            <option value="">Select Year</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="currentYear">Current Section:</label>
+                        <input type="text" id="currentYear" name="current_section" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentType">Student Type:</label>
+                        <select id="studentType" name="StudentType" class="form-control mb-2" required>
+                            <option value="">Select Type</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Irregular">Irregular</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="studentCampus">Student Campus:</label>
+                        <select id="studentCampus" name="student_campus" class="form-control mb-2" required>
+                            <option value="" selected>Please specify:</option>
+                            <option value="Batasan Campus">Batasan Campus</option>
+                            <option value="San Francisco Campus">San Francisco Campus</option>
+                            <option value="San Bartolome Campus">San Bartolome Campus</option>
+                        </select>
+                    </div>
+
+
+                    <!-- Button to open the Confirmation Modal -->
+                    <button type="button" class="btn btn-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#confirmAddStudentModal">Add Student</button>
+                    
+                    <!-- Confirmation Modal -->
+                    <div class="modal fade" id="confirmAddStudentModal" tabindex="-1" aria-labelledby="confirmAddStudentModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmAddStudentModalLabel">Confirm Action</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to add this student record?
+                                </div>
+                                <div class="modal-footer">
+                                    <!-- Cancel Button to Close Modal -->
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <!-- Submit Button to Confirm Submission -->
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="submitForm()">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading Modal with Spinner -->
+                    <div class="modal fade" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="loadingModalLabel">Please Wait</h5>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <div class="spinner-border text-primary mt-3" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2">Processing...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Function to submit form after confirmation
+    function submitForm() {
+        // Trigger form submission
+        document.getElementById("addStudentForm").submit();
+    }
+
+    document.getElementById("studentNumber").addEventListener("input", function () {
+        let studentNumber = this.value;
+        let enrollmentYearField = document.getElementById("enrollmentYear");
+        let currentYearField = document.getElementById("currentYear");
+
+        // Regex to match the format "YY-0000"
+        let regex = /^(\d{2})-(\d{4})$/;
+
+        if (regex.test(studentNumber)) {
+            let yearPrefix = studentNumber.match(regex)[1];
+            let currentYear = new Date().getFullYear();
+
+            // Calculate the full enrollment year based on the student number prefix
+            let enrollmentYear = (parseInt(yearPrefix) <= parseInt(currentYear.toString().slice(-2)))
+                ? "20" + yearPrefix
+                : "19" + yearPrefix;
+
+            enrollmentYearField.value = enrollmentYear;  // Update enrollment year
+            enrollmentYearField.disabled = true;  // Disable field
+
+            // Set the current year (it can be changed by the user later)
+            currentYearField.value = enrollmentYear;  // Set the current year to match enrollment year by default
+            currentYearField.disabled = false;  // Enable the current year field
+        } else {
+            enrollmentYearField.disabled = true;  // Disable if the format is invalid
+            currentYearField.disabled = true;  // Disable current year field
+        }
+    });
+
+
+    // Department and course mapping
+    const courseYearMapping = {
+        "College of Education": {
+            "Bachelor of Early Childhood Education (BECEd)": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
+        },
+        "College of Business Administration and Accountancy": {
+            "Bachelor of Science in Accountancy (BSA)": ["1st Year", "2nd Year", "3rd Year", "4th Year"],
+            "Bachelor of Science in Entrepreneurship (BS Entrep)": ["1st Year", "2nd Year", "3rd Year"]
+        },
+        "College of Engineering": {
+            "Bachelor of Science in Industrial Engineering (IE)": ["1st Year", "2nd Year", "3rd Year", "4th Year"],
+            "Bachelor of Science in Electronics Engineering (BSECE)": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
+        },
+        "College of Computer Studies": {
+            "Bachelor of Science in Information Technology": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const departmentSelect = document.getElementById('department');
+        const courseSelect = document.getElementById('course');
+        const currentYearSelect = document.getElementById('currentYear');
+
+        // Populate the courses when the department changes
+        departmentSelect.addEventListener('change', function () {
+            const selectedDepartment = this.value;
+
+            // Reset courses and current year dropdowns
+            courseSelect.innerHTML = '<option value="">Select Course</option>';
+            courseSelect.disabled = true;
+            currentYearSelect.innerHTML = '<option value="">Select Year</option>';
+            currentYearSelect.disabled = true;
+
+            // Populate the courses for the selected department
+            if (selectedDepartment && courseYearMapping[selectedDepartment]) {
+                Object.keys(courseYearMapping[selectedDepartment]).forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course;
+                    option.textContent = course;
+                    courseSelect.appendChild(option);
+                });
+                courseSelect.disabled = false;
+            }
+        });
+
+        // Populate the current years when the course changes
+        courseSelect.addEventListener('change', function () {
+            const selectedDepartment = departmentSelect.value;
+            const selectedCourse = this.value;
+
+            // Reset the current year dropdown
+            currentYearSelect.innerHTML = '<option value="">Select Year</option>';
+            currentYearSelect.disabled = true;
+
+            // Populate the current year dropdown based on the selected course
+            if (selectedCourse && courseYearMapping[selectedDepartment][selectedCourse]) {
+                courseYearMapping[selectedDepartment][selectedCourse].forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    currentYearSelect.appendChild(option);
+                });
+                currentYearSelect.disabled = false;
+            }
+        });
+    });
+
+</script>

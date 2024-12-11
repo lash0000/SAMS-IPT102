@@ -61,7 +61,7 @@
                     </div>
 
                     <!-- Button to open the Confirmation Modal -->
-                    <button type="button" class="btn btn-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#confirmReport">Proceed</button>
+                    <button id="validateBtn" type="button" class="btn btn-primary w-100 mt-3">Proceed</button>
 
                     <!-- Confirmation Modal -->
                     <div class="modal fade" id="confirmReport" tabindex="-1" aria-labelledby="confirmReportLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
@@ -110,9 +110,13 @@
     document.addEventListener("DOMContentLoaded", () => {
         // Disable all input fields on page load
         const formElements = document.querySelectorAll("#GenerateReportForm input, #GenerateReportForm select");
+        const validateBtn = document.querySelector("#validateBtn");
+
         formElements.forEach(element => {
             element.disabled = true;
         });
+
+        validateBtn.disabled = true;
 
         // Check if data already exists in localStorage and redirect if it does
         if (localStorage.getItem("attendanceReportData")) {
@@ -123,7 +127,22 @@
             formElements.forEach(element => {
                 element.disabled = false;
             });
+            validateBtn.disabled = false;
         }
+
+        validateBtn.addEventListener("click", (event) => {
+            // Prevent the modal from showing if the form is invalid
+            const form = document.getElementById("GenerateReportForm");
+
+            if (!validateForm(form)) {
+                alert("Please fill in all required fields.");
+                return; // Stop here if form validation fails
+            }
+
+            // Show the Confirm Action Modal if the form is valid
+            const confirmModal = new bootstrap.Modal(document.getElementById("confirmReport"));
+            confirmModal.show();
+        });
     });
 
     // Function to submit form, save to localStorage, and show spinner before redirection
@@ -165,14 +184,17 @@
     // Function to validate the form fields
     function validateForm(form) {
         const requiredFields = form.querySelectorAll("[required]");
+        let isValid = true;
+
         for (const field of requiredFields) {
             if (!field.value.trim()) {
                 field.classList.add("is-invalid");
-                return false;
+                isValid = false;
             } else {
                 field.classList.remove("is-invalid");
             }
         }
-        return true;
+
+        return isValid;
     }
 </script>

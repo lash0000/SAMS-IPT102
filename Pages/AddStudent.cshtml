@@ -82,7 +82,7 @@
                     </div>
                     <div class="form-group">
                         <label for="studentType">Student Type:</label>
-                        <select id="studentType" name="StudentType" class="form-control mb-2" required>
+                        <select id="studentType" name="student_type" class="form-control mb-2" required>
                             <option value="">Select Type</option>
                             <option value="Regular">Regular</option>
                             <option value="Irregular">Irregular</option>
@@ -171,13 +171,13 @@
                 : "19" + yearPrefix;
 
             enrollmentYearField.value = enrollmentYear;  // Update enrollment year
-            enrollmentYearField.disabled = true;  // Disable field
+            // enrollmentYearField.readOnly = true;  // Disable field
 
             // Set the current year (it can be changed by the user later)
             currentYearField.value = enrollmentYear;  // Set the current year to match enrollment year by default
             currentYearField.disabled = false;  // Enable the current year field
         } else {
-            enrollmentYearField.disabled = true;  // Disable if the format is invalid
+            // enrollmentYearField.disabled = true;  // Disable if the format is invalid
             currentYearField.disabled = true;  // Disable current year field
         }
     });
@@ -189,15 +189,15 @@
             "Bachelor of Early Childhood Education (BECEd)": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
         },
         "College of Business Administration and Accountancy": {
-            "Bachelor of Science in Accountancy (BSA)": ["1st Year", "2nd Year", "3rd Year", "4th Year"],
-            "Bachelor of Science in Entrepreneurship (BS Entrep)": ["1st Year", "2nd Year", "3rd Year"]
+            "BSA": ["1st Year", "2nd Year", "3rd Year", "4th Year"],
+            "BS Entrep": ["1st Year", "2nd Year", "3rd Year"]
         },
         "College of Engineering": {
-            "Bachelor of Science in Industrial Engineering (IE)": ["1st Year", "2nd Year", "3rd Year", "4th Year"],
-            "Bachelor of Science in Electronics Engineering (BSECE)": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
+            "BSIE": ["1st Year", "2nd Year", "3rd Year", "4th Year"],
+            "BSECE": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
         },
         "College of Computer Studies": {
-            "Bachelor of Science in Information Technology": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
+            "BSIT": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
         }
     };
 

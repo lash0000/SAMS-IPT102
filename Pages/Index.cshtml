@@ -1,94 +1,178 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Welcome to your attendance record management.";
+    ViewData["Title"] = "How's going?";
 }
 
-<section class="d-flex align-items-center justify-content-center flex-column vh-100">
-    <div class="dashboard-wrapper">
-        <div class="text-center mb-3">
-            <h1>Student Attendance Record</h1>
-            <p>Applicable for today's class (Do some refresh to reload the page)</p>
-            <button class="btn btn-primary" onclick="refreshPage()">Refresh</button>
-        </div>
-        <div class="student-data">
-            <div style="max-height: 320px; overflow-y: auto;">
-                <table class="table table-bordered" id="attendanceTable">
-                    <thead>
-                        <tr>
-                            <th>Student Number</th>
-                            <th>Student (LN, FN, MI)</th>
-                            <th>RFID Number</th>
-                            <th>Current Year &amp; Course</th>
-                            <th>Current Section</th>
-                            <th>Date &amp; Time (Time-In)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.AttendanceRecords != null && Model.AttendanceRecords.Any())
-                        {
-                            foreach (var record in Model.AttendanceRecords)
-                            {
-                                <tr>
-                                    <td>@record.StudentNumber</td>
-                                    <td>@record.LastName, @record.FirstName @record.MiddleInitial.</td>
-                                    <td>@record.RFIDNumber</td>
-                                    <td>@record.Course</td>
-                                    <td>@record.CurrentSection</td>
-                                    <td>@record.AttendanceDateTime</td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr>
-                                <td colspan="6" class="text-center">No records available.</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+<section class="d-flex align-items-center justify-content-center mt-4 mb-4" style="min-height: calc(100vh - 80px);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-primary">
+                    <a href="/" class="text-decoration-none text-primary">What is your class today?</a>
+                </h2>
+                <p>Fill out form below for generating attendance report.</p>
+                <form id="GenerateReportForm" method="post">
+                    <div class="form-group">
+                        <label for="SubjectCode">Subject Code:</label>
+                        <input type="text" id="SubjectCode" name="subject_code" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="SubjectName">Subject Name:</label>
+                        <input type="text" id="SubjectName" name="subject_name" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="Room">Room:</label>
+                        <input type="text" id="Room" name="room_assigned" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="schoolCampus">School Campus:</label>
+                        <select id="schoolCampus" name="school_campus" class="form-control mb-2" required>
+                            <option value="" selected>Please specify:</option>
+                            <option value="Batasan Campus">Batasan Campus</option>
+                            <option value="San Francisco Campus">San Francisco Campus</option>
+                            <option value="San Bartolome Campus">San Bartolome Campus</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="course">Course:</label>
+                        <select id="schoolCourse" name="school_course" class="form-control mb-2" required>
+                            <option value="" selected>Please specify:</option>
+                            <option value="BECED">Bachelor of Early Childhood Education (BECEd)</option>
+                            <option value="BSA">Bachelor of Science in Accountancy</option>
+                            <option value="BSIE">Bachelor of Science in Industrial Engineering</option>
+                            <option value="BSECE">Bachelor of Science in Electronics Engineering</option>
+                            <option value="BSIT">Bachelor of Science in Information Technology</option>
+                            <option value="BSCS">Bachelor of Science in Computer Science</option>
+                            <option value="BSCE">Bachelor of Science in Computer Engineering</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="Professor">Professor Name:</label>
+                        <input type="text" id="Professor" name="professor_name" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="StartClasses">Start of Classes:</label>
+                        <input type="time" id="StartClasses" name="start_classes" class="form-control mb-2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="EndClasses">End of Classes:</label>
+                        <input type="time" id="EndClasses" name="end_classes" class="form-control mb-2" required>
+                    </div>
 
-    <div class="d-md-flex align-items-center justify-content-center mt-3">
-        <a class="btn btn-primary me-2" href="@Url.Page("/GenerateReports")">Generate Summary Reports</a>
-        <a class="btn btn-primary me-2" href="@Url.Page("/AddStudent")">Add New Student</a>
-        <button class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#clearAttendanceModal">Clear Attendance Logs</button>
-        <!-- <a class="btn btn-primary" href="#">Student Records Management</a> -->
-    </div>
+                    <!-- Button to open the Confirmation Modal -->
+                    <button type="button" class="btn btn-primary w-100 mt-3" data-bs-toggle="modal" data-bs-target="#confirmReport">Proceed</button>
 
-    <!-- Confirmation Modal -->
-    <div class="modal fade" id="clearAttendanceModal" tabindex="-1" aria-labelledby="clearAttendanceModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="clearAttendanceModalLabel">Confirm Action</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to clear the attendance logs? This action cannot be undone.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <!-- Post request for clearing logs -->
-                    <form method="post" asp-page-handler="ClearAttendanceLogs">
-                        <button type="submit" class="btn btn-danger">Confirm</button>
-                    </form>
-                </div>
+                    <!-- Confirmation Modal -->
+                    <div class="modal fade" id="confirmReport" tabindex="-1" aria-labelledby="confirmReportLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmAddStudentModalLabel">Confirm Action</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    This action cannot be undone unless if you decide to Proceed with Add Classes in different page after.
+                                </div>
+                                <div class="modal-footer">
+                                    <!-- Cancel Button to Close Modal -->
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <!-- Submit Button to Confirm Submission -->
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="submitForm()">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading Modal with Spinner -->
+                    <div class="modal fade" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="loadingModalLabel">Please Wait</h5>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <div class="spinner-border text-primary mt-3" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2">Processing...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </section>
 
-<div class="principal-author">
-    <a href="/SAMS-IPT102.zip" class="btn btn-link" download>
-        Try this out.
-    </a>
-</div>
-
 <script>
-    function refreshPage() {
-        location.reload(); // This reloads the entire page
+    document.addEventListener("DOMContentLoaded", () => {
+        // Disable all input fields on page load
+        const formElements = document.querySelectorAll("#GenerateReportForm input, #GenerateReportForm select");
+        formElements.forEach(element => {
+            element.disabled = true;
+        });
+
+        // Check if data already exists in localStorage and redirect if it does
+        if (localStorage.getItem("attendanceReportData")) {
+            // If form data exists, immediately redirect to Dashboard
+            window.location.replace("/Dashboard"); // Faster, prevents going back
+        } else {
+            // Enable the form fields if no data in localStorage
+            formElements.forEach(element => {
+                element.disabled = false;
+            });
+        }
+    });
+
+    // Function to submit form, save to localStorage, and show spinner before redirection
+    function submitForm() {
+        const form = document.getElementById("GenerateReportForm");
+
+        // Validate all form fields before saving
+        const isValid = validateForm(form);
+        if (!isValid) {
+            alert("Please fill out all required fields.");
+            return; // Prevent form submission if validation fails
+        }
+
+        // Collect form data
+        const formData = new FormData(form);
+        const data = {};
+
+        // Populate the data object with form fields
+        for (const [key, value] of formData.entries()) {
+            data[key] = value;
+        }
+
+        // Store the data object in localStorage
+        localStorage.setItem("attendanceReportData", JSON.stringify(data));
+
+        // Show success alert
+        alert("Form data saved successfully! Redirecting to Dashboard...");
+
+        // Show loading spinner modal
+        const loadingModal = new bootstrap.Modal(document.getElementById("loadingModal"));
+        loadingModal.show();
+
+        // Redirect to Dashboard after 2 seconds
+        setTimeout(() => {
+            window.location.replace("/Dashboard");
+        }, 2000);
+    }
+
+    // Function to validate the form fields
+    function validateForm(form) {
+        const requiredFields = form.querySelectorAll("[required]");
+        for (const field of requiredFields) {
+            if (!field.value.trim()) {
+                field.classList.add("is-invalid");
+                return false;
+            } else {
+                field.classList.remove("is-invalid");
+            }
+        }
+        return true;
     }
 </script>

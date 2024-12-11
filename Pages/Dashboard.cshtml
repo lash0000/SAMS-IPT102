@@ -1,0 +1,110 @@
+﻿@page
+@model SAMS_IPT102.Pages.DashboardModel
+@{
+    ViewData["Title"] = "Welcome to your attendance record management.";
+}
+
+<section class="d-flex align-items-center justify-content-center flex-column vh-100">
+    <div class="dashboard-wrapper">
+        <div class="text-center mb-3">
+            <h1>Student Attendance Record</h1>
+            <p>Applicable for today's class (Do some refresh to reload the page)</p>
+        </div>
+        <div id="Dashboard">
+            <div class="d-flex flex-row justify-content-between">
+                <aside class="d-flex flex-column">
+                    <div id="SubjectCode" class="d-inline-flex align-middle">
+                        <label class="me-2">Subject Code:</label>
+                        <p id="subjectCodeValue">N/A</p>
+                    </div>
+                    <div id="SubjectName" class="d-inline-flex align-middle">
+                        <label class="me-2">Subject Name:</label>
+                        <p id="subjectNameValue">N/A</p>
+                    </div>
+                </aside>
+                <aside class="d-flex flex-column">
+                    <div id="Course" class="d-inline-flex align-middle">
+                        <label class="me-2">Course:</label>
+                        <p id="courseValue">N/A</p>
+                    </div>
+                </aside>
+                <aside class="d-flex flex-column">
+                    <div id="Room" class="d-inline-flex align-middle">
+                        <label class="me-2">Year & Section:</label>
+                        <p id="yearSectionValue">N/A</p>
+                    </div>
+                    <div id="TimeDetails" class="d-inline-flex align-middle">
+                        <label class="me-2">Time:</label>
+                        <p id="timeValue">(N/A)</p>
+                    </div>
+                </aside>
+            </div>
+
+            <div class="student-data">
+                <div style="max-height: 320px; overflow-y: auto;">
+                    <table class="table table-bordered" id="attendanceTable">
+                        <thead>
+                            <tr>
+                                <th>Student Number</th>
+                                <th>Student (LN, FN, MI)</th>
+                                <th>Current Year &amp; Course</th>
+                                <th>Current Section</th>
+                                <th>Date &amp; Time (Time-In)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.AttendanceRecords != null && Model.AttendanceRecords.Any())
+                            {
+                                foreach (var record in Model.AttendanceRecords)
+                                {
+                                    <tr>
+                                        <td>@record.StudentNumber</td>
+                                        <td>@record.LastName, @record.FirstName @record.MiddleInitial.</td>
+                                        <td>@record.Course</td>
+                                        <td>@record.CurrentSection</td>
+                                        <td>@record.AttendanceDateTime</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center">No records available.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="d-md-flex align-items-center justify-content-center mt-3">
+        <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#">Generate Attendance Report</button>
+        <!--<a class="btn btn-primary me-2" href="@Url.Page("/GenerateReports")">Generate Report</a>-->
+        <button class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#clearAttendanceModal">Clear Attendance Logs</button>
+        <a class="btn btn-primary me-2" href="@Url.Page("/AddStudent")">Add New Student</a>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddNewClassModal">Add New Classes</button>
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const storedData = JSON.parse(localStorage.getItem("attendanceReportData"));
+        if (storedData) {
+            // Function to convert time to 12-hour format
+            const formatTimeTo12Hour = (time) => {
+                const date = new Date(`1970-01-01T${time}Z`);
+                const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+                return date.toLocaleTimeString([], options);
+            };
+
+            document.getElementById("subjectCodeValue").textContent = storedData.subject_code || "N/A";
+            document.getElementById("subjectNameValue").textContent = storedData.subject_name || "N/A";
+            document.getElementById("courseValue").textContent = storedData.school_course || "N/A";
+            document.getElementById("yearSectionValue").textContent = storedData.room_assigned || "N/A";
+            document.getElementById("timeValue").textContent = `(${formatTimeTo12Hour(storedData.start_classes || "00:00")} - ${formatTimeTo12Hour(storedData.end_classes || "00:00")})`;
+        }
+    });
+</script>

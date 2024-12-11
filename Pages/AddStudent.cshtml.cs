@@ -31,7 +31,7 @@ namespace SAMS_IPT102.Pages
 
             // Set the current date for the student registration
             NewStudent.last_login = null;
-            NewStudent.student_registered_date = null;
+            NewStudent.student_registered_date = DateTime.UtcNow.ToString("o");
 
             // Ensure the "is_student_new_registered" field is set to "yes"
             NewStudent.is_student_new_registered = "yes";

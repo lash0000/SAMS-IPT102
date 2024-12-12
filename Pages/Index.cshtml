@@ -181,17 +181,38 @@
         }, 2000);
     }
 
-    // Function to validate the form fields
     function validateForm(form) {
         const requiredFields = form.querySelectorAll("[required]");
         let isValid = true;
 
+        // Check for empty required fields
         for (const field of requiredFields) {
             if (!field.value.trim()) {
                 field.classList.add("is-invalid");
                 isValid = false;
             } else {
                 field.classList.remove("is-invalid");
+            }
+        }
+
+        // Time validation for StartClasses and EndClasses
+        const startTimeField = form.querySelector("#StartClasses");
+        const endTimeField = form.querySelector("#EndClasses");
+        if (startTimeField && endTimeField) {
+            const startTime = new Date(`1970-01-01T${startTimeField.value}`);
+            const endTime = new Date(`1970-01-01T${endTimeField.value}`);
+
+            // Check if end time is after 9:00 PM
+            const maxEndTime = new Date(`1970-01-01T21:00:00`);
+
+            if (startTime >= endTime || endTime > maxEndTime) {
+                alert("Start time must be earlier than the end time, and end time cannot be after 9:00 PM.");
+                startTimeField.classList.add("is-invalid");
+                endTimeField.classList.add("is-invalid");
+                isValid = false;
+            } else {
+                startTimeField.classList.remove("is-invalid");
+                endTimeField.classList.remove("is-invalid");
             }
         }
 

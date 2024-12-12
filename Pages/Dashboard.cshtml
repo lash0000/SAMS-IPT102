@@ -171,33 +171,33 @@
             document.getElementById("timeValue").textContent = `(${formatTimeTo12Hour(storedData.start_classes || "00:00")} - ${formatTimeTo12Hour(storedData.end_classes || "00:00")})`;
         }
     });
-    // Function to handle form submission, clear localStorage, show loading modal, and redirect
     function submitForm() {
         // Show an alert prompt before proceeding
         alert("You are about to submit the form. Please wait while we process.");
 
-        // Close the "Add New Class" confirmation modal
-        const addNewClassModal = document.getElementById('AddNewClassModal');
-        const modalInstance = new bootstrap.Modal(addNewClassModal);
-        modalInstance.hide(); // Close the modal with Bootstrap's modal instance
+        // Get the modal element for "Confirm Action"
+        const confirmReportModal = document.getElementById('confirmReport');
 
-        // Ensure the modal is completely hidden before showing the loading modal
+        // Explicitly hide the modal using Bootstrap's modal instance
+        const modalInstance = bootstrap.Modal.getInstance(confirmReportModal);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+
+        // Check and clear LocalStorage
+        if (localStorage.getItem("attendanceReportData")) {
+            localStorage.removeItem("attendanceReportData");
+        }
+
+        // Show the loading modal
+        const loadingModal = document.getElementById('loadingModal');
+        const loadingModalInstance = new bootstrap.Modal(loadingModal);
+        loadingModalInstance.show();
+
+        // Simulate form submission and redirect after a delay
         setTimeout(() => {
-            // Check and clear localStorage
-            if (localStorage.getItem("attendanceReportData")) {
-                localStorage.removeItem("attendanceReportData");
-            }
-
-            // Show the loading modal with Bootstrap's modal instance
-            const loadingModal = document.getElementById('loadingModal');
-            const loadingModalInstance = new bootstrap.Modal(loadingModal);
-            loadingModalInstance.show(); // Show the loading modal
-
-            // Simulate form submission processing (can be replaced with actual form submission code)
-            setTimeout(() => {
-                // Redirect to the index page after a delay
-                window.location.replace("/");
-            }, 3000); // Adjust time as needed (3000ms = 3 seconds)
-        }, 3000); // Add a slight delay before showing the loading modal
+            window.location.replace("/");
+        }, 3000); // Adjust time as needed
     }
+
 </script>

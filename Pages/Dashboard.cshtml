@@ -81,7 +81,9 @@
     </div>
 
     <div class="d-md-flex align-items-center justify-content-center mt-3">
-        <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#">Generate Attendance Report</button>
+        <form method="post" asp-page-handler="GenerateAttendanceReport">
+            <button type="submit" class="btn btn-primary me-2">Generate Attendance Report</button>
+        </form>
         <!--<a class="btn btn-primary me-2" href="@Url.Page("/GenerateReports")">Generate Report</a>-->
         <button class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#clearAttendanceModal">Clear Attendance Logs</button>
         <a class="btn btn-primary me-2" href="@Url.Page("/AddStudent")">Add New Student</a>
@@ -159,18 +161,20 @@
         if (storedData) {
             // Function to convert time to 12-hour format
             const formatTimeTo12Hour = (time) => {
-                const date = new Date(`1970-01-01T${time}Z`);
-                const options = { hour: '2-digit', minute: '2-digit', hour12: true };
-                return date.toLocaleTimeString([], options);
+                const [hours, minutes] = time.split(":").map(Number);
+                const period = hours >= 12 ? "PM" : "AM";
+                const adjustedHours = hours % 12 || 12;
+                return `${adjustedHours}:${String(minutes).padStart(2, "0")} ${period}`;
             };
 
             document.getElementById("subjectCodeValue").textContent = storedData.subject_code || "N/A";
             document.getElementById("subjectNameValue").textContent = storedData.subject_name || "N/A";
             document.getElementById("courseValue").textContent = storedData.school_course || "N/A";
-            document.getElementById("yearSectionValue").textContent = storedData.room_assigned || "N/A";
+            document.getElementById("yearSectionValue").textContent = storedData.year_section || "N/A";
             document.getElementById("timeValue").textContent = `(${formatTimeTo12Hour(storedData.start_classes || "00:00")} - ${formatTimeTo12Hour(storedData.end_classes || "00:00")})`;
         }
     });
+
     function submitForm() {
         // Show an alert prompt before proceeding
         alert("You are about to submit the form. Please wait while we process.");

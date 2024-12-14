@@ -199,4 +199,35 @@ namespace SAMS_IPT102.Pages
             }
         }
     }
+
+    public class StudentRecord
+    {
+        public string student_number { get; set; }
+        public string first_name { get; set; }
+        public string last_name { get; set; }
+        public string middle_name { get; set; }
+        public string rfid_number { get; set; }
+        public string course { get; set; }
+        public string current_section { get; set; }
+    }
+
+    public class AttendanceLog
+    {
+        public string student_number { get; set; }
+        public string attendance_time_in { get; set; }
+    }
+
+
+    public class AttendanceRecord
+{
+    public string StudentNumber { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string MiddleInitial { get; set; } // Calculate this based on the middle name
+    public string RFIDNumber { get; set; }
+    public string Course { get; set; }
+    public string CurrentSection { get; set; }
+    public string AttendanceDateTime { get; set; }
+}
+
 }

@@ -91,6 +91,7 @@ namespace SAMS_IPT102.Pages
                 var studentRecords = JsonConvert.DeserializeObject<List<StudentRecord>>(studentRecordsJson);
 
                 // Retrieve attendance data from localStorage (mocked here, replace with actual retrieval)
+                // How can I intergrate localStorage attributes here e.g school_course=value
                 var attendanceData = new
                 {
                     subject_code = "BSIT301",

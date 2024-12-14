@@ -4,6 +4,10 @@ This system is only portal to professors so this activity dedicates to Professor
 
 Also, this system have a RFID Integration for automated tracking process to handle attendance management.
 
+```powershell
+Only, the generated attendance report is main problem here I can go back here sooner.
+```
+
 ## For Development Libraries we used from NuGet
 
 ```html

@@ -76,27 +76,54 @@ namespace SAMS_IPT102.Pages
                 return RedirectToPage("Error");
             }
         }
-
         // OnPostGenerateAttendanceReport method to generate an attendance report in Word format
         [HttpPost]
         public async Task<IActionResult> OnPostGenerateAttendanceReport(
-    string subject_code,
-    string subject_name,
-    string room_assigned,
-    string school_campus,
-    string school_course,
-    string year_section,
-    string professor_name,
-    string start_classes,
-    string end_classes)
+            string subject_code,
+            string subject_name,
+            string room_assigned,
+            string school_campus,
+            string school_course,
+            string year_section,
+            string professor_name,
+            string start_classes,
+            string end_classes)
         {
             try
             {
-                // Fetch student records from the API
-                var response = await _httpClient.GetAsync("https://zmwu5nxsk7.execute-api.ap-southeast-2.amazonaws.com/dev/api/v1/student-records");
-                response.EnsureSuccessStatusCode();
-                var studentRecordsJson = await response.Content.ReadAsStringAsync();
-                var studentRecords = JsonConvert.DeserializeObject<List<StudentRecord>>(studentRecordsJson);
+                // Fetch attendance logs
+                var attendanceLogUrl = "https://zmwu5nxsk7.execute-api.ap-southeast-2.amazonaws.com/dev/api/v1/attendance-log-attempts";
+                var attendanceResponse = await _httpClient.GetAsync(attendanceLogUrl);
+                var attendanceContent = await attendanceResponse.Content.ReadAsStringAsync();
+                var attendanceLogs = JsonConvert.DeserializeObject<List<AttendanceLog>>(attendanceContent) ?? new List<AttendanceLog>();
+
+                // Fetch student records
+                var studentRecordsUrl = "https://zmwu5nxsk7.execute-api.ap-southeast-2.amazonaws.com/dev/api/v1/student-records";
+                var studentResponse = await _httpClient.GetAsync(studentRecordsUrl);
+                var studentContent = await studentResponse.Content.ReadAsStringAsync();
+                var studentRecords = JsonConvert.DeserializeObject<List<StudentRecord>>(studentContent) ?? new List<StudentRecord>();
+
+                // Combine records to include all students and mark those with no attendance as "Absent"
+                var attendanceRecords = (from student in studentRecords
+                                         join attendance in attendanceLogs
+                                         on student.student_number equals attendance.student_number into attendanceGroup
+                                         from attendance in attendanceGroup.DefaultIfEmpty()
+                                         select new AttendanceRecord
+                                         {
+                                             StudentNumber = student.student_number ?? "",
+                                             LastName = student.last_name ?? "",
+                                             FirstName = student.first_name ?? "",
+                                             MiddleInitial = !string.IsNullOrEmpty(student.middle_name)
+                                                 ? student.middle_name.Substring(0, 1).ToUpper()
+                                                 : "",
+                                             Course = $"{student.current_year} S.Y, {student.course}",
+                                             CurrentSection = $"{student.current_section}",
+                                             AttendanceDateTime = attendance?.attendance_time_in != null
+                                                 ? FormatAttendanceDateTime(attendance.attendance_time_in)
+                                                 : "Absent"
+                                         })
+                                         .OrderByDescending(a => DateTime.TryParse(a.AttendanceDateTime, out DateTime parsedDate) ? parsedDate : DateTime.MinValue)
+                                         .ToList();
 
                 // Generate Word document in memory
                 using var memoryStream = new MemoryStream();
@@ -107,14 +134,26 @@ namespace SAMS_IPT102.Pages
                     var body = mainPart.Document.AppendChild(new Body());
 
                     // Add report header
-                    body.AppendChild(new Paragraph(new Run(new Text("Student Attendance Report"))
-                    {
-                        RunProperties = new RunProperties(new Bold(), new FontSize { Val = "28" })
-                    }));
+                    //body.AppendChild(new Paragraph(new Run(new Text("Student Attendance Report"))
+                    //{
+                    //    RunProperties = new RunProperties(new Bold(), new FontSize { Val = "28" })
+                    //}));
+
+                    var titleParagraph = new Paragraph(
+                        new ParagraphProperties(
+                            new Justification() { Val = JustificationValues.Center } // Center the text
+                        ),
+                        new Run(
+                            new RunProperties(new Bold(), new FontSize { Val = "28" }), // Bold and font size
+                            new Text($"GENERATED ATTENDANCE REPORT FOR SECTION {year_section}") // Include year_section dynamically
+                        )
+                    );
+                    body.AppendChild(titleParagraph);
+
 
                     body.AppendChild(new Paragraph(new Run(new Text($"Subject Code: {subject_code} - {subject_name}"))));
                     body.AppendChild(new Paragraph(new Run(new Text($"Course: {school_course}, Section: {year_section}"))));
-                    body.AppendChild(new Paragraph(new Run(new Text($"Professor: {professor_name}"))));
+                    // body.AppendChild(new Paragraph(new Run(new Text($"Professor: {professor_name}"))));
                     body.AppendChild(new Paragraph(new Run(new Text($"Class Schedule: {start_classes} - {end_classes}"))));
                     body.AppendChild(new Paragraph(new Run(new Text($"Room: {room_assigned}, Campus: {school_campus}"))));
                     body.AppendChild(new Paragraph(new Run(new Text($"Date Generated: {DateTime.Now:MMMM dd, yyyy}"))));
@@ -140,26 +179,40 @@ namespace SAMS_IPT102.Pages
                         CreateTableCell("Last Name", true),
                         CreateTableCell("First Name", true),
                         CreateTableCell("Middle Initial", true),
+                        CreateTableCell("Course & Year", true),
+                        CreateTableCell("Section", true),
                         CreateTableCell("Attendance Time-In", true)
                     );
                     attendanceTable.AppendChild(headerRow);
 
-                    // Add student rows
-                    foreach (var student in studentRecords)
+                    // Add student attendance records to table
+                    foreach (var record in attendanceRecords)
                     {
                         var row = new TableRow();
                         row.Append(
-                            CreateTableCell(student.student_number),
-                            CreateTableCell(student.last_name),
-                            CreateTableCell(student.first_name),
-                            CreateTableCell(student.middle_name ?? "-"),
-                            CreateTableCell(DateTime.Now.ToString("hh:mm tt")) // Simulate time-in dynamically
+                            CreateTableCell(record.StudentNumber),
+                            CreateTableCell(record.LastName),
+                            CreateTableCell(record.FirstName),
+                            CreateTableCell(record.MiddleInitial),
+                            CreateTableCell(record.Course),
+                            CreateTableCell(record.CurrentSection),
+                            CreateTableCell(record.AttendanceDateTime)
                         );
                         attendanceTable.AppendChild(row);
                     }
 
                     // Append table to the document
                     body.AppendChild(attendanceTable);
+
+                    // Add Note Section
+                    body.AppendChild(new Paragraph(new Run(new Text("")))); // Add spacing
+                    body.AppendChild(new Paragraph(new Run(new Text("Note: These are all registered students inside the attendance management system. If there are known circumstances, please consider them to register inside the web portal."))));
+
+                    // Add Professor Signature Section
+                    body.AppendChild(new Paragraph(new Run(new Text("")))); // Add spacing
+                    body.AppendChild(new Paragraph(new Run(new Text("___________________________________________"))));
+                    body.AppendChild(new Paragraph(new Run(new Text($"Professor: {professor_name} (Full Signature Over Printed Name)"))));
+
                     mainPart.Document.Save();
                 }
 

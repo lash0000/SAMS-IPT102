@@ -80,6 +80,7 @@ namespace SAMS_IPT102.Pages
         public string student_campus { get; set; }
         public string last_name { get; set; }
         public string course { get; set; }
+        public int age { get; set; }
         public string current_section { get; set; }
         public string current_year { get; set; }
         public string first_name { get; set; }

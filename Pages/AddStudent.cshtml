@@ -51,7 +51,11 @@
                         <input type="date" id="dateOfBirth" name="date_of_birth" class="form-control mb-2">
                     </div>
                     <div class="form-group">
-                        <label for="phoneNumber">Phone Number:</label>
+                        <label for="studentAge">Age:</label>
+                        <input type="number" id="studentAge" name="age" class="form-control mb-2">
+                    </div>
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number (+63):</label>
                         <input type="number" id="phoneNumber" name="phone_number" placeholder="ex: (+63)" class="form-control mb-2">
                     </div>
                     <div class="form-group">
@@ -77,8 +81,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="currentYear">Current Section:</label>
-                        <input type="text" id="currentYear" name="current_section" class="form-control mb-2" required>
+                        <label for="currentSection">Current Section:</label>
+                        <input type="text" id="currentSection" name="current_section" class="form-control mb-2" required>
                     </div>
                     <div class="form-group">
                         <label for="studentType">Student Type:</label>
@@ -153,60 +157,168 @@
         document.getElementById("addStudentForm").submit();
     }
 
-    document.getElementById("studentNumber").addEventListener("input", function () {
-        let studentNumber = this.value;
-        let enrollmentYearField = document.getElementById("enrollmentYear");
-        let currentYearField = document.getElementById("currentYear");
-
-        // Regex to match the format "YY-0000"
-        let regex = /^(\d{2})-(\d{4})$/;
-
-        if (regex.test(studentNumber)) {
-            let yearPrefix = studentNumber.match(regex)[1];
-            let currentYear = new Date().getFullYear();
-
-            // Calculate the full enrollment year based on the student number prefix
-            let enrollmentYear = (parseInt(yearPrefix) <= parseInt(currentYear.toString().slice(-2)))
-                ? "20" + yearPrefix
-                : "19" + yearPrefix;
-
-            enrollmentYearField.value = enrollmentYear;  // Update enrollment year
-            // enrollmentYearField.readOnly = true;  // Disable field
-
-            // Set the current year (it can be changed by the user later)
-            currentYearField.value = enrollmentYear;  // Set the current year to match enrollment year by default
-            currentYearField.disabled = false;  // Enable the current year field
-        } else {
-            // enrollmentYearField.disabled = true;  // Disable if the format is invalid
-            currentYearField.disabled = true;  // Disable current year field
-        }
-    });
-
-
-    // Department and course mapping
-    const courseYearMapping = {
-        "College of Education": {
-            "Bachelor of Early Childhood Education (BECEd)": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
-        },
-        "College of Business Administration and Accountancy": {
-            "BSA": ["1st Year", "2nd Year", "3rd Year", "4th Year"],
-            "BS Entrep": ["1st Year", "2nd Year", "3rd Year"]
-        },
-        "College of Engineering": {
-            "BSIE": ["1st Year", "2nd Year", "3rd Year", "4th Year"],
-            "BSECE": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
-        },
-        "College of Computer Studies": {
-            "BSIT": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
-        }
-    };
-
     document.addEventListener('DOMContentLoaded', function () {
+
+        document.getElementById("rfidNumber").addEventListener("keydown", function (e) {
+            let rfidNumber = this.value;
+            let key = e.key;
+
+            // Allow only numeric keys (0-9) and some control keys (Backspace, Tab, ArrowLeft, ArrowRight)
+            if (!/^[0-9]$/.test(key) && key !== 'Backspace' && key !== 'Tab' && key !== 'ArrowLeft' && key !== 'ArrowRight') {
+                e.preventDefault();  // Prevent non-numeric characters and keys
+            } else if (rfidNumber.length >= 10 && /^[0-9]$/.test(key)) {
+                // Prevent input when the length is already 11 digits
+                e.preventDefault();
+            }
+        });
+
+        // Function to convert the input to uppercase
+        function convertToUpperCase(input) {
+            input.value = input.value.toUpperCase();  // Convert the value to uppercase
+        }
+
+        // Add the input event listener for the name fields
+        document.getElementById("firstName").addEventListener("input", function () {
+            convertToUpperCase(this);
+        });
+
+        document.getElementById("middleName").addEventListener("input", function () {
+            convertToUpperCase(this);
+        });
+
+        document.getElementById("lastName").addEventListener("input", function () {
+            convertToUpperCase(this);
+        });
+
+        // Date of Birth validation: auto-fill the Age field (readonly) when the date is specified
+        document.getElementById("dateOfBirth").addEventListener("change", function () {
+            let dob = new Date(this.value);
+            let ageField = document.getElementById("studentAge");
+
+            if (dob && !isNaN(dob)) {
+                let today = new Date();
+                let age = today.getFullYear() - dob.getFullYear();
+                let m = today.getMonth() - dob.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                    age--;
+                }
+                // Automatically fill the Age field and ensure it's readonly
+                ageField.value = age;
+            }
+        });
+
+        // Current Section: Ensure uppercase (use keydown to change input to uppercase in real-time)
+        document.getElementById("currentSection").addEventListener("keydown", function (e) {
+            let key = e.key;
+            // Allow letters and prevent inputting numbers or special characters
+            if (/[a-zA-Z]/.test(key)) {
+                this.value = this.value.toUpperCase();
+            }
+        });
+
+        // Phone number validation: Only accept numbers (using RegEx) and max 11 digits (keydown event)
+        document.getElementById("phoneNumber").addEventListener("keydown", function (e) {
+            let phoneNumber = this.value;
+            let key = e.key;
+            // Allow numeric characters, backspace, arrow keys, and prevent more than 11 digits
+            if (!/^[0-9]$/.test(key) && key !== 'Backspace' && key !== 'ArrowLeft' && key !== 'ArrowRight') {
+                e.preventDefault();  // Prevent non-numeric characters
+            } else if (phoneNumber.length >= 10 && /^[0-9]$/.test(key)) {
+                e.preventDefault();  // Prevent more than 11 digits
+            }
+        });
+
+        document.getElementById("studentNumber").addEventListener("input", function () {
+            let studentNumber = this.value;
+            let enrollmentYearField = document.getElementById("enrollmentYear");
+            let currentYearField = document.getElementById("currentYear");
+
+            // Regex to match the format "YY-0000"
+            let regex = /^(\d{2})-(\d{4})$/;
+
+            // Validate the input format and update enrollmentYear and currentYear fields
+            if (regex.test(studentNumber)) {
+                let yearPrefix = studentNumber.match(regex)[1];
+                let currentYear = new Date().getFullYear();
+
+                // Calculate the full enrollment year based on the student number prefix
+                let enrollmentYear = (parseInt(yearPrefix) <= parseInt(currentYear.toString().slice(-2)))
+                    ? "20" + yearPrefix
+                    : "19" + yearPrefix;
+
+                enrollmentYearField.value = enrollmentYear;  // Update enrollment year
+                enrollmentYearField.readOnly = true;  // Optionally disable editing of enrollment year
+
+                // Set the current year (it can be changed by the user later)
+                currentYearField.value = enrollmentYear;  // Set the current year to match enrollment year by default
+                currentYearField.disabled = false;  // Enable the current year field
+            } else {
+                // If the input is invalid, disable the current year field
+                currentYearField.disabled = true;
+                enrollmentYearField.value = ''; // Optionally clear the enrollment year field
+            }
+        });
+
+        document.getElementById("studentNumber").addEventListener("keydown", function (e) {
+            let studentNumber = this.value;
+            let key = e.key;
+
+            // Allow Backspace, Arrow keys (Left, Right), and Tab
+            if (key === 'Backspace' || key === 'ArrowLeft' || key === 'ArrowRight' || key === 'Tab') {
+                return;  // Allow these keys to proceed
+            }
+
+            // Format: 00-0000 (allow numbers, backspace, and dash only)
+            let regex = /^\d{2}-\d{0,4}$/;  // Allow max of 7 characters (2+1+4)
+
+            // Prevent any character other than numbers or dash
+            if (!/^\d$/.test(key) && key !== '-') {
+                e.preventDefault();  // Prevent non-numeric and non-dash characters
+            }
+
+            // Prevent exceeding the max length (7 characters)
+            if (studentNumber.length >= 7 && /^[0-9]$/.test(key)) {
+                e.preventDefault();  // Prevent exceeding 7 characters
+            }
+
+            // Allow the dash only after the second character (00-0000 format)
+            if (studentNumber.length === 2 && key !== '-') {
+                e.preventDefault();
+            }
+
+            // Allow Backspace to remove the last character
+            if (key === 'Backspace' && studentNumber.length <= 3) {
+                // Allow deletion of the dash if it's at position 3
+                if (studentNumber.length === 3) {
+                    this.value = studentNumber.slice(0, -1);  // Remove dash
+                }
+            }
+        });
+
+
+        // Department and course mapping
+        const courseYearMapping = {
+            "College of Education": {
+                "Bachelor of Early Childhood Education (BECEd)": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
+            },
+            "College of Business Administration and Accountancy": {
+                "BSA": ["1st Year", "2nd Year", "3rd Year", "4th Year"],
+                "BS Entrep": ["1st Year", "2nd Year", "3rd Year"]
+            },
+            "College of Engineering": {
+                "BSIE": ["1st Year", "2nd Year", "3rd Year", "4th Year"],
+                "BSECE": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
+            },
+            "College of Computer Studies": {
+                "BSIT": ["1st Year", "2nd Year", "3rd Year", "4th Year"]
+            }
+        };
+
+        // Populate the courses and current year based on selected department and course
         const departmentSelect = document.getElementById('department');
         const courseSelect = document.getElementById('course');
         const currentYearSelect = document.getElementById('currentYear');
 
-        // Populate the courses when the department changes
         departmentSelect.addEventListener('change', function () {
             const selectedDepartment = this.value;
 
@@ -233,11 +345,9 @@
             const selectedDepartment = departmentSelect.value;
             const selectedCourse = this.value;
 
-            // Reset the current year dropdown
             currentYearSelect.innerHTML = '<option value="">Select Year</option>';
             currentYearSelect.disabled = true;
 
-            // Populate the current year dropdown based on the selected course
             if (selectedCourse && courseYearMapping[selectedDepartment][selectedCourse]) {
                 courseYearMapping[selectedDepartment][selectedCourse].forEach(year => {
                     const option = document.createElement('option');
@@ -248,6 +358,6 @@
                 currentYearSelect.disabled = false;
             }
         });
-    });
 
+    });
 </script>

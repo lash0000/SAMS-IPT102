@@ -103,7 +103,6 @@ namespace SAMS_IPT102.Pages
                 var studentContent = await studentResponse.Content.ReadAsStringAsync();
                 var studentRecords = JsonConvert.DeserializeObject<List<StudentRecord>>(studentContent) ?? new List<StudentRecord>();
 
-                // Combine records to include all students and mark those with no attendance as "Absent"
                 var attendanceRecords = (from student in studentRecords
                                          join attendance in attendanceLogs
                                          on student.student_number equals attendance.student_number into attendanceGroup
@@ -122,6 +121,8 @@ namespace SAMS_IPT102.Pages
                                                  ? FormatAttendanceDateTime(attendance.attendance_time_in)
                                                  : "Absent"
                                          })
+                                         .GroupBy(a => a.StudentNumber)  // Group by student number
+                                         .Select(group => group.OrderByDescending(a => DateTime.TryParse(a.AttendanceDateTime, out DateTime parsedDate) ? parsedDate : DateTime.MinValue).FirstOrDefault())  // Get the latest attendance record
                                          .OrderByDescending(a => DateTime.TryParse(a.AttendanceDateTime, out DateTime parsedDate) ? parsedDate : DateTime.MinValue)
                                          .ToList();
 

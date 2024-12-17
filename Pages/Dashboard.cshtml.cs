@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
@@ -78,95 +79,115 @@ namespace SAMS_IPT102.Pages
 
         // OnPostGenerateAttendanceReport method to generate an attendance report in Word format
         [HttpPost]
-        public async Task<IActionResult> OnPostGenerateAttendanceReport()
+        public async Task<IActionResult> OnPostGenerateAttendanceReport(
+    string subject_code,
+    string subject_name,
+    string room_assigned,
+    string school_campus,
+    string school_course,
+    string year_section,
+    string professor_name,
+    string start_classes,
+    string end_classes)
         {
             try
             {
                 // Fetch student records from the API
-                var client = new HttpClient();
-                var response = await client.GetAsync("https://zmwu5nxsk7.execute-api.ap-southeast-2.amazonaws.com/dev/api/v1/student-records");
+                var response = await _httpClient.GetAsync("https://zmwu5nxsk7.execute-api.ap-southeast-2.amazonaws.com/dev/api/v1/student-records");
                 response.EnsureSuccessStatusCode();
-
                 var studentRecordsJson = await response.Content.ReadAsStringAsync();
                 var studentRecords = JsonConvert.DeserializeObject<List<StudentRecord>>(studentRecordsJson);
 
-                // Retrieve attendance data from localStorage (mocked here, replace with actual retrieval)
-                // How can I intergrate localStorage attributes here e.g school_course=value
-                var attendanceData = new
-                {
-                    subject_code = "BSIT301",
-                    subject_name = "Advanced Programming",
-                    school_course = "BSIT",
-                    year_section = "3K",
-                    start_classes = "10:00",
-                    end_classes = "12:00"
-                };
-
-                // Define the file path for the report
-                var filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "AttendanceReport.docx");
-
-                // Create the Word document
-                using (var doc = WordprocessingDocument.Create(filePath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
+                // Generate Word document in memory
+                using var memoryStream = new MemoryStream();
+                using (var doc = WordprocessingDocument.Create(memoryStream, DocumentFormat.OpenXml.WordprocessingDocumentType.Document, true))
                 {
                     var mainPart = doc.AddMainDocumentPart();
                     mainPart.Document = new Document();
                     var body = mainPart.Document.AppendChild(new Body());
 
-                    // Add a Header
-                    body.Append(new Paragraph(new Run(new Text("Quezon City University")) { RunProperties = new RunProperties { Bold = new Bold() } }));
-                    body.Append(new Paragraph(new Run(new Text("Generated Attendance Report for Section " + attendanceData.year_section))));
-                    body.Append(new Paragraph(new Run(new Text($"Subject Code: {attendanceData.subject_code}"))));
-                    body.Append(new Paragraph(new Run(new Text($"Subject Name: {attendanceData.subject_name}"))));
-                    body.Append(new Paragraph(new Run(new Text($"Course: {attendanceData.school_course}"))));
-                    body.Append(new Paragraph(new Run(new Text($"Date Generated: {DateTime.Now:MMMM dd, yyyy}"))));
+                    // Add report header
+                    body.AppendChild(new Paragraph(new Run(new Text("Student Attendance Report"))
+                    {
+                        RunProperties = new RunProperties(new Bold(), new FontSize { Val = "28" })
+                    }));
 
-                    // Add a Table
-                    var table = new Table();
+                    body.AppendChild(new Paragraph(new Run(new Text($"Subject Code: {subject_code} - {subject_name}"))));
+                    body.AppendChild(new Paragraph(new Run(new Text($"Course: {school_course}, Section: {year_section}"))));
+                    body.AppendChild(new Paragraph(new Run(new Text($"Professor: {professor_name}"))));
+                    body.AppendChild(new Paragraph(new Run(new Text($"Class Schedule: {start_classes} - {end_classes}"))));
+                    body.AppendChild(new Paragraph(new Run(new Text($"Room: {room_assigned}, Campus: {school_campus}"))));
+                    body.AppendChild(new Paragraph(new Run(new Text($"Date Generated: {DateTime.Now:MMMM dd, yyyy}"))));
+                    body.AppendChild(new Paragraph(new Run(new Text("")))); // Add spacing
 
-                    // Add Table Headers
+                    // Create attendance table
+                    var attendanceTable = new Table();
+                    attendanceTable.AppendChild(new TableProperties(
+                        new TableBorders(
+                            new TopBorder { Val = BorderValues.Single, Size = 12 },
+                            new BottomBorder { Val = BorderValues.Single, Size = 12 },
+                            new LeftBorder { Val = BorderValues.Single, Size = 12 },
+                            new RightBorder { Val = BorderValues.Single, Size = 12 },
+                            new InsideHorizontalBorder { Val = BorderValues.Single, Size = 12 },
+                            new InsideVerticalBorder { Val = BorderValues.Single, Size = 12 }
+                        )
+                    ));
+
+                    // Add table header row
                     var headerRow = new TableRow();
                     headerRow.Append(
-                        new TableCell(new Paragraph(new Run(new Text("Student Number")))),
-                        new TableCell(new Paragraph(new Run(new Text("Name (LN, FN, MI)")))),
-                        new TableCell(new Paragraph(new Run(new Text("Year & Section")))),
-                        new TableCell(new Paragraph(new Run(new Text("Time In")))),
-                        new TableCell(new Paragraph(new Run(new Text("Remarks"))))
+                        CreateTableCell("Student Number", true),
+                        CreateTableCell("Last Name", true),
+                        CreateTableCell("First Name", true),
+                        CreateTableCell("Middle Initial", true),
+                        CreateTableCell("Attendance Time-In", true)
                     );
-                    table.Append(headerRow);
+                    attendanceTable.AppendChild(headerRow);
 
-                    // Add Data Rows from API
+                    // Add student rows
                     foreach (var student in studentRecords)
                     {
-                        var dataRow = new TableRow();
-                        dataRow.Append(
-                            new TableCell(new Paragraph(new Run(new Text(student.student_number)))),
-                            new TableCell(new Paragraph(new Run(new Text($"{student.last_name}, {student.first_name}, {student.middle_name?.Substring(0, 1)}.")))),
-                            new TableCell(new Paragraph(new Run(new Text(student.current_section)))),
-                            new TableCell(new Paragraph(new Run(new Text(attendanceData.start_classes)))), // Use actual attendance time-in if available
-                            new TableCell(new Paragraph(new Run(new Text("")))) // Placeholder for remarks
+                        var row = new TableRow();
+                        row.Append(
+                            CreateTableCell(student.student_number),
+                            CreateTableCell(student.last_name),
+                            CreateTableCell(student.first_name),
+                            CreateTableCell(student.middle_name ?? "-"),
+                            CreateTableCell(DateTime.Now.ToString("hh:mm tt")) // Simulate time-in dynamically
                         );
-                        table.Append(dataRow);
+                        attendanceTable.AppendChild(row);
                     }
 
-                    body.Append(table);
-
-                    // Add Footer
-                    body.Append(new Paragraph(new Run(new Text("Note: This is a system-generated report. If discrepancies are found, please verify with the registration portal."))));
-                    body.Append(new Paragraph(new Run(new Text("Professor: ________________________________"))));
+                    // Append table to the document
+                    body.AppendChild(attendanceTable);
+                    mainPart.Document.Save();
                 }
 
-                // Return the generated document as a downloadable file
-                var fileBytes = System.IO.File.ReadAllBytes(filePath);
-                return File(fileBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "AttendanceReport.docx");
+                memoryStream.Seek(0, SeekOrigin.Begin); // Reset stream position
+
+                // Return the Word document as a file download
+                return File(memoryStream.ToArray(), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "AttendanceReport.docx");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to generate attendance report: {ex.Message}");
-                ModelState.AddModelError(string.Empty, "Failed to generate attendance report.");
-                return Page();
+                _logger.LogError($"Error generating attendance report: {ex.Message}");
+                return StatusCode(500, "An error occurred while generating the report.");
             }
         }
 
+        // Helper method for creating table cells
+        private TableCell CreateTableCell(string text, bool isHeader = false)
+        {
+            var runProperties = new RunProperties();
+            if (isHeader)
+            {
+                runProperties.Bold = new Bold();
+                runProperties.FontSize = new FontSize { Val = "22" };
+            }
+
+            var paragraph = new Paragraph(new Run(new Text(text)));
+            return new TableCell(paragraph);
+        }
 
         // Method to format the attendance datetime for the report
         private string FormatAttendanceDateTime(string attendanceTimeIn)

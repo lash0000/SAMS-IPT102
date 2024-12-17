@@ -82,6 +82,15 @@
 
     <div class="d-md-flex align-items-center justify-content-center mt-3">
         <form method="post" asp-page-handler="GenerateAttendanceReport">
+            <input type="hidden" id="subject_code" name="subject_code">
+            <input type="hidden" id="subject_name" name="subject_name">
+            <input type="hidden" id="room_assigned" name="room_assigned">
+            <input type="hidden" id="school_campus" name="school_campus">
+            <input type="hidden" id="school_course" name="school_course">
+            <input type="hidden" id="year_section" name="year_section">
+            <input type="hidden" id="professor_name" name="professor_name">
+            <input type="hidden" id="start_classes" name="start_classes">
+            <input type="hidden" id="end_classes" name="end_classes">
             <button type="submit" class="btn btn-primary me-2">Generate Attendance Report</button>
         </form>
         <!--<a class="btn btn-primary me-2" href="@Url.Page("/GenerateReports")">Generate Report</a>-->
@@ -202,6 +211,22 @@
         setTimeout(() => {
             window.location.replace("/");
         }, 3000); // Adjust time as needed
+    }
+
+    // Get the data from localStorage
+    const savedData = JSON.parse(localStorage.getItem('attendanceData'));
+
+    // Populate hidden input fields with localStorage values
+    if (savedData) {
+        document.getElementById('subject_code').value = savedData.subject_code;
+        document.getElementById('subject_name').value = savedData.subject_name;
+        document.getElementById('room_assigned').value = savedData.room_assigned;
+        document.getElementById('school_campus').value = savedData.school_campus;
+        document.getElementById('school_course').value = savedData.school_course;
+        document.getElementById('year_section').value = savedData.year_section;
+        document.getElementById('professor_name').value = savedData.professor_name;
+        document.getElementById('start_classes').value = savedData.start_classes;
+        document.getElementById('end_classes').value = savedData.end_classes;
     }
 
 </script>

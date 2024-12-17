@@ -167,20 +167,37 @@
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         const storedData = JSON.parse(localStorage.getItem("attendanceReportData"));
-        if (storedData) {
-            // Function to convert time to 12-hour format
-            const formatTimeTo12Hour = (time) => {
-                const [hours, minutes] = time.split(":").map(Number);
-                const period = hours >= 12 ? "PM" : "AM";
-                const adjustedHours = hours % 12 || 12;
-                return `${adjustedHours}:${String(minutes).padStart(2, "0")} ${period}`;
-            };
+        const savedData = JSON.parse(localStorage.getItem("attendanceReportData"));
 
+        // Function to convert time to 12-hour format
+        const formatTimeTo12Hour = (time) => {
+            const [hours, minutes] = time.split(":").map(Number);
+            const period = hours >= 12 ? "PM" : "AM";
+            const adjustedHours = hours % 12 || 12;
+            return `${adjustedHours}:${String(minutes).padStart(2, "0")} ${period}`;
+        };
+
+        if (storedData) {
             document.getElementById("subjectCodeValue").textContent = storedData.subject_code || "N/A";
             document.getElementById("subjectNameValue").textContent = storedData.subject_name || "N/A";
             document.getElementById("courseValue").textContent = storedData.school_course || "N/A";
             document.getElementById("yearSectionValue").textContent = storedData.year_section || "N/A";
             document.getElementById("timeValue").textContent = `(${formatTimeTo12Hour(storedData.start_classes || "00:00")} - ${formatTimeTo12Hour(storedData.end_classes || "00:00")})`;
+        }
+
+        // Populate hidden input fields with localStorage values
+        if (savedData) {
+            document.getElementById('subject_code').value = savedData.subject_code;
+            document.getElementById('subject_name').value = savedData.subject_name;
+            document.getElementById('room_assigned').value = savedData.room_assigned;
+            document.getElementById('school_campus').value = savedData.school_campus;
+            document.getElementById('school_course').value = savedData.school_course;
+            document.getElementById('year_section').value = savedData.year_section;
+            document.getElementById('professor_name').value = savedData.professor_name;
+
+            // Use formatTimeTo12Hour function to convert the time values
+            document.getElementById('start_classes').value = formatTimeTo12Hour(savedData.start_classes || "00:00");
+            document.getElementById('end_classes').value = formatTimeTo12Hour(savedData.end_classes || "00:00");
         }
     });
 
@@ -211,22 +228,6 @@
         setTimeout(() => {
             window.location.replace("/");
         }, 3000); // Adjust time as needed
-    }
-
-    // Get the data from localStorage
-    const savedData = JSON.parse(localStorage.getItem('attendanceData'));
-
-    // Populate hidden input fields with localStorage values
-    if (savedData) {
-        document.getElementById('subject_code').value = savedData.subject_code;
-        document.getElementById('subject_name').value = savedData.subject_name;
-        document.getElementById('room_assigned').value = savedData.room_assigned;
-        document.getElementById('school_campus').value = savedData.school_campus;
-        document.getElementById('school_course').value = savedData.school_course;
-        document.getElementById('year_section').value = savedData.year_section;
-        document.getElementById('professor_name').value = savedData.professor_name;
-        document.getElementById('start_classes').value = savedData.start_classes;
-        document.getElementById('end_classes').value = savedData.end_classes;
     }
 
 </script>

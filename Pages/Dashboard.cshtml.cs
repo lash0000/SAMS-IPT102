@@ -262,7 +262,7 @@ namespace SAMS_IPT102.Pages
         {
             if (DateTime.TryParse(attendanceTimeIn, out DateTime attendanceDateTime))
             {
-                TimeZoneInfo taipeiTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Taipei");
+                TimeZoneInfo taipeiTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Taipei Standard Time");
                 DateTime taipeiDateTime = TimeZoneInfo.ConvertTime(attendanceDateTime, taipeiTimeZone);
                 return taipeiDateTime.ToString("dd/MM/yyyy hh:mm tt");
             }

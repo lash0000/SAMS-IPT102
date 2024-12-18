@@ -209,8 +209,10 @@
             // Check if end time is after 9:00 PM
             const maxEndTime = new Date(`1970-01-01T21:00:00`);
 
-            if (startTime >= endTime || endTime > maxEndTime) {
-                alert("Start time must be earlier than the end time, and end time cannot be after 9:00 PM.");
+            // Check if the time difference between start and end is less than 20 minutes
+            const timeDifference = (endTime - startTime) / 60000; // Difference in minutes
+            if (startTime >= endTime || endTime > maxEndTime || timeDifference < 20) {
+                alert("Start time must be earlier than the end time, end time cannot be after 9:00 PM, and there must be at least a 20-minute gap between start and end times.");
                 startTimeField.classList.add("is-invalid");
                 endTimeField.classList.add("is-invalid");
                 isValid = false;

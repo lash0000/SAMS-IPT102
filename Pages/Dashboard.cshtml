@@ -76,6 +76,22 @@
                     </table>
                 </div>
             </div>
+
+            <div class="d-flex flex-row justify-content-between">
+                <aside class="d-flex flex-column">
+                    <div id="SubjectCode" class="d-inline-flex align-middle">
+                        <label class="me-2">Registered Students:</label>
+                        <p id="registerStudentValue">@Model.RegisteredStudentsCount</p>
+                    </div>
+                </aside>
+                <aside class="d-flex flex-column">
+                    <div id="SubjectCode" class="d-inline-flex align-middle">
+                        <label class="me-2">Absentees:</label>
+                        <p id="absenteesValue">@Model.AbsenteesCount</p>
+                    </div>
+                </aside>
+            </div>
+
         </div>
 
     </div>

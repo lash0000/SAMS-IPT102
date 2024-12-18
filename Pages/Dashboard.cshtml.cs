@@ -25,23 +25,28 @@ namespace SAMS_IPT102.Pages
         // List to store attendance records
         public List<AttendanceRecord> AttendanceRecords { get; set; } = new List<AttendanceRecord>();
 
-        // OnGet method to fetch attendance logs and student records
+        public int AbsenteesCount { get; set; } = 0;
+        public int RegisteredStudentsCount { get; set; } = 0;
+
         public async Task OnGet()
         {
             var attendanceLogUrl = "https://zmwu5nxsk7.execute-api.ap-southeast-2.amazonaws.com/dev/api/v1/attendance-log-attempts";
             var studentRecordsUrl = "https://zmwu5nxsk7.execute-api.ap-southeast-2.amazonaws.com/dev/api/v1/student-records/";
 
-            // Fetch attendance logs (no changes here)
+            // Fetch attendance logs
             var attendanceResponse = await _httpClient.GetAsync(attendanceLogUrl);
             var attendanceContent = await attendanceResponse.Content.ReadAsStringAsync();
             var attendanceLogs = JsonConvert.DeserializeObject<List<AttendanceLog>>(attendanceContent) ?? new List<AttendanceLog>();
 
-            // Fetch student records (no changes here)
+            // Fetch student records
             var studentResponse = await _httpClient.GetAsync(studentRecordsUrl);
             var studentContent = await studentResponse.Content.ReadAsStringAsync();
             var studentRecords = JsonConvert.DeserializeObject<List<StudentRecord>>(studentContent) ?? new List<StudentRecord>();
 
-            // Join attendance and student records based on student_number (no changes here)
+            // Count the total registered students (length of student records)
+            RegisteredStudentsCount = studentRecords.Count;
+
+            // Join attendance and student records based on student_number
             AttendanceRecords = (from attendance in attendanceLogs
                                  join student in studentRecords on attendance.student_number equals student.student_number
                                  select new AttendanceRecord
@@ -58,7 +63,16 @@ namespace SAMS_IPT102.Pages
                                  })
                                  .OrderByDescending(a => DateTime.TryParse(a.AttendanceDateTime, out DateTime parsedDate) ? parsedDate : DateTime.MinValue)
                                  .ToList();
+
+            // Find absentees by checking which students from the studentRecords are not in the attendanceLogs
+            var attendedStudentNumbers = attendanceLogs.Select(a => a.student_number).Distinct();
+            var allStudentNumbers = studentRecords.Select(s => s.student_number).Distinct();
+            var absentees = allStudentNumbers.Except(attendedStudentNumbers).ToList();
+
+            // Count the absentees
+            AbsenteesCount = absentees.Count;
         }
+
 
         // OnPostClearAttendanceLogsAsync method to delete all attendance logs
         public async Task<IActionResult> OnPostClearAttendanceLogsAsync()
@@ -308,5 +322,6 @@ namespace SAMS_IPT102.Pages
             public string last_name { get; set; }
             public string current_section { get; set; }
         }
+
     }
 }

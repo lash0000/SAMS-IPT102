@@ -222,4 +222,45 @@
 
         return isValid;
     }
+
+    // Function to convert the input to uppercase
+    function convertToUpperCase(input) {
+        input.value = input.value.toUpperCase();  // Convert the value to uppercase
+    }
+
+    // Add the input event listener for the name fields
+
+    document.getElementById("SubjectCode").addEventListener("input", function () {
+        convertToUpperCase(this);
+    });
+
+    document.getElementById("Room").addEventListener("input", function () {
+        convertToUpperCase(this);
+    });
+
+    document.getElementById("YearSection").addEventListener("input", function () {
+        convertToUpperCase(this);
+    });
+
+    // Function to capitalize the first letter of each word
+    function capitalizeWords(input) {
+        let words = input.value.split(" ");
+        for (let i = 0; i < words.length; i++) {
+            if (words[i]) {
+                // Capitalize the first letter of the word
+                words[i] = words[i][0].toUpperCase() + words[i].substring(1).toLowerCase();
+            }
+        }
+        // Update the input value with the capitalized words
+        input.value = words.join(" ");
+    }
+
+    // Add event listener to the input field
+    document.getElementById("SubjectName").addEventListener("input", function () {
+        capitalizeWords(this);
+    });
+
+    document.getElementById("Professor").addEventListener("input", function () {
+        capitalizeWords(this);
+    });
 </script>

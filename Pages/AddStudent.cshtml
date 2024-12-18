@@ -208,12 +208,8 @@
         });
 
         // Current Section: Ensure uppercase (use keydown to change input to uppercase in real-time)
-        document.getElementById("currentSection").addEventListener("keydown", function (e) {
-            let key = e.key;
-            // Allow letters and prevent inputting numbers or special characters
-            if (/[a-zA-Z]/.test(key)) {
-                this.value = this.value.toUpperCase();
-            }
+        document.getElementById("currentSection").addEventListener("input", function () {
+            convertToUpperCase(this);
         });
 
         // Phone number validation: Only accept numbers (using RegEx) and max 11 digits (keydown event)

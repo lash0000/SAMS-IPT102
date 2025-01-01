@@ -4,6 +4,8 @@ This system is only portal to professors so this activity dedicates to Professor
 
 Also, this system have a RFID Integration for automated tracking process to handle attendance management.
 
+Additionally, you can play with my API stored publicly here no worries I can tell it just a hunch!
+
 ```powershell
 Only, the generated attendance report is main problem here I can go back here sooner.
 ```
